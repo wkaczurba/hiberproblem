@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -18,6 +19,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -32,18 +34,38 @@ public class ZoneSetting implements Serializable {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)		
-	private Long id;
-	private ZoneMode mode;
-	private Boolean manualModeSetting;
+	@Column(name="ZONE_SETTING_ID")
+	private long id = 0;
+//	private ZoneMode mode;
+//	private Boolean manualModeSetting;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional=false)
 	//@JoinColumn(name = "STOCK_ID", nullable = false)	
 	HeatingSettings heatingSettings;  
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)	
-	private Set<ZoneTimerEntry> automaticModeSettings = new HashSet<>();
+	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)	
+	private Set<ZoneTimerEntry> automaticModeSettings;
 	
-	private ZoneSetting() {}
+	private ZoneSetting() {
+		automaticModeSettings = new HashSet<>();
+	}
+		
+	public ZoneSetting(ZoneMode mode, Boolean manualModeSetting, ZoneTimerEntry... automaticModeSettings) {
+		this();
+		//this.mode = mode;
+		//this.manualModeSetting = manualModeSetting;		
+		for (ZoneTimerEntry zte : automaticModeSettings) {
+			this.automaticModeSettings.add(zte);
+			zte.setZoneSetting(this);
+		}
+	}
+	
+	public ZoneSetting(ZoneMode mode, Boolean manualModeSetting, Set<ZoneTimerEntry> automaticModeSettings) {
+		this(mode, manualModeSetting, automaticModeSettings.toArray(new ZoneTimerEntry[0]));
+//		this.mode = mode;
+//		this.manualModeSetting = manualModeSetting;
+//		this.automaticModeSettings.addAll(automaticModeSettings);
+	}	
 	
 	// Randomize stuff:
 	public static ZoneSetting createRandom() {
@@ -55,21 +77,6 @@ public class ZoneSetting implements Serializable {
 		
 		return new ZoneSetting(mode, manualModeSetting, automaticModeSettings);
 		
-	}
-	
-	public ZoneSetting(ZoneMode mode, Boolean manualModeSetting, ZoneTimerEntry... automaticModeSettings) {
-		this.mode = mode;
-		this.manualModeSetting = manualModeSetting;		
-		for (ZoneTimerEntry zte : automaticModeSettings) {
-			this.automaticModeSettings.add(zte);
-		}
-	}
-	
-	public ZoneSetting(ZoneMode mode, Boolean manualModeSetting, Set<ZoneTimerEntry> automaticModeSettings) {
-		this(mode, manualModeSetting, automaticModeSettings.toArray(new ZoneTimerEntry[0]));
-//		this.mode = mode;
-//		this.manualModeSetting = manualModeSetting;
-//		this.automaticModeSettings.addAll(automaticModeSettings);
 	}	
 	
 	public HeatingSettings getHeatingSettings() {
@@ -88,30 +95,30 @@ public class ZoneSetting implements Serializable {
 //	}
 
 		
-	/**
-	 * @return the mode
-	 */
-	public ZoneMode getMode() {
-		return mode;
-	}
-	/**
-	 * @param mode the mode to set
-	 */
-	public void setMode(ZoneMode mode) {
-		this.mode = mode;
-	}
-	/**
-	 * @return the manualModeSetting
-	 */
-	public Boolean getManualModeSetting() {
-		return manualModeSetting;
-	}
-	/**
-	 * @param manualModeSetting the manualModeSetting to set
-	 */
-	public void setManualModeSetting(Boolean manualModeSetting) {
-		this.manualModeSetting = manualModeSetting;
-	}
+//	/**
+//	 * @return the mode
+//	 */
+//	public ZoneMode getMode() {
+//		return mode;
+//	}
+//	/**
+//	 * @param mode the mode to set
+//	 */
+//	public void setMode(ZoneMode mode) {
+//		this.mode = mode;
+//	}
+//	/**
+//	 * @return the manualModeSetting
+//	 */
+//	public Boolean getManualModeSetting() {
+//		return manualModeSetting;
+//	}
+//	/**
+//	 * @param manualModeSetting the manualModeSetting to set
+//	 */
+//	public void setManualModeSetting(Boolean manualModeSetting) {
+//		this.manualModeSetting = manualModeSetting;
+//	}
 	/**
 	 * @return the automaticModeSettings
 	 */
@@ -148,7 +155,7 @@ public class ZoneSetting implements Serializable {
 //				+ ", automaticModeSettings=" + automaticModeSettings + "]";
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("ZoneSetting id=" + id + ", mode=" + mode + ", manualModeSetting=" + manualModeSetting + ":\n");
+		sb.append("ZoneSetting id=" + id + /*", mode=" + mode  +*/ ", manualModeSetting=\n" /*+ manualModeSetting + ":\n"*/);
 		automaticModeSettings.forEach(x -> {
 			sb.append(x.toString().replaceAll("(?m)^", "\t"));
 			sb.append("\n");
@@ -161,7 +168,7 @@ public class ZoneSetting implements Serializable {
 	/**
 	 * @return the id
 	 */
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -180,8 +187,8 @@ public class ZoneSetting implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((automaticModeSettings == null) ? 0 : automaticModeSettings.hashCode());
-		result = prime * result + ((manualModeSetting == null) ? 0 : manualModeSetting.hashCode());
-		result = prime * result + ((mode == null) ? 0 : mode.hashCode());
+//		result = prime * result + ((manualModeSetting == null) ? 0 : manualModeSetting.hashCode());
+//		result = prime * result + ((mode == null) ? 0 : mode.hashCode());
 		return result;
 	}
 
@@ -202,13 +209,13 @@ public class ZoneSetting implements Serializable {
 				return false;
 		} else if (!automaticModeSettings.equals(other.automaticModeSettings))
 			return false;
-		if (manualModeSetting == null) {
+/*		if (manualModeSetting == null) {
 			if (other.manualModeSetting != null)
 				return false;
 		} else if (!manualModeSetting.equals(other.manualModeSetting))
 			return false;
 		if (mode != other.mode)
-			return false;
+			return false;*/
 		return true;
 	}
 

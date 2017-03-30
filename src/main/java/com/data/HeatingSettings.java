@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -30,24 +31,29 @@ public class HeatingSettings implements Serializable {
 	private static final long serialVersionUID = 253595098289219101L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)	
-	private Long id;
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name="HEATING_SETTINGS_ID")
+	private long id = 0;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
 	//private List<ZoneSetting> zones = new ArrayList<>();
-	private List<ZoneSetting> zones = new ArrayList<>();
+	private List<ZoneSetting> zones;
 	
 	//@SuppressWarnings("unused")
-	private HeatingSettings() { 
+	public HeatingSettings() { 
+		zones = new ArrayList<>();
 	}
 	
 	public HeatingSettings(ZoneSetting... zones) {
+		this();
 		for (ZoneSetting zone : zones) {
 			this.zones.add(zone);
+			zone.setHeatingSettings(this);
 		}
 	}
 	
 	public HeatingSettings(List<ZoneSetting> zones) {
+		this();
 		throw new IllegalStateException("This funciton should not be called");
 //		this.zones.clear();
 //		this.zones.addAll(zones);
@@ -109,7 +115,7 @@ public class HeatingSettings implements Serializable {
 		} else {
 			for (int i=0; i<zones.size(); i++) {
 				sb.append((i + ": " + zones.get(i).toString()) .replaceAll("(?m)^", "    "));
-				if (i < zones.size() - 1)
+				if (i < zones.size())
 					sb.append("\n");
 			}
 			sb.deleteCharAt(sb.lastIndexOf("\n"));
@@ -140,7 +146,7 @@ public class HeatingSettings implements Serializable {
 	/**
 	 * @return the id
 	 */
-	public Long getId() {
+	public long getId() {
 		return id;
 	}
 

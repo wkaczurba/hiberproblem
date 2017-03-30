@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -17,9 +18,9 @@ public interface HeatingRepository extends JpaRepository<HeatingSettings, Long> 
 	 */
 	default HeatingSettings createInitial() {
 		HeatingSettings hs = new HeatingSettings(
-				new ZoneSetting(ZoneMode.MANUAL, true, ZoneTimerEntry.create("7:00", "5:00", "monday, tuesday", "january,february")),
-				new ZoneSetting(ZoneMode.MANUAL, true, ZoneTimerEntry.create("17:00", "23:33", "monday, tuesday", "january,february")),
-				new ZoneSetting(ZoneMode.MANUAL, true, ZoneTimerEntry.create("7:00", "5:00", "monday, tuesday", "january,february")));			
+				new ZoneSetting(ZoneMode.MANUAL, true, ZoneTimerEntry.create("7:00" /*, "5:00", "monday, tuesday", "january,february"*/)),
+				new ZoneSetting(ZoneMode.MANUAL, true, ZoneTimerEntry.create("17:00"/*, "23:33", "monday, tuesday", "january,february"*/)),
+				new ZoneSetting(ZoneMode.MANUAL, true, ZoneTimerEntry.create("7:00"/*, "5:00", "monday, tuesday", "january,february"*/)));			
 		
 /*		ZoneSetting zs0 = new ZoneSetting(ZoneMode.MANUAL, true);
 		ZoneSetting zs1 = new ZoneSetting(ZoneMode.MANUAL, true);
@@ -39,6 +40,13 @@ public interface HeatingRepository extends JpaRepository<HeatingSettings, Long> 
 		hs.addZone(zs1);
 		hs.addZone(zs2);*/
 		
-		return this.save(hs);				
+		hs = this.save(hs);
+		System.out.println("hs: " + hs);
+		
+		List<HeatingSettings> hsAll = this.findAll();
+		System.out.println("hsAll.size()=="+hsAll.size()+": " + hsAll);
+		System.out.println("----");
+		return hs;
+//		return null;
 	}	
 }
