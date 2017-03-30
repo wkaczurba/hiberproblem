@@ -15,5 +15,7 @@ public class HiberproblemApplication {
 		problem.problem();
 		problem.read();
 		
+		// TODO: Try removing array list etc from private constructors.!
+		
 	}
 }

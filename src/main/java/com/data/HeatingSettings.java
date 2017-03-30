@@ -16,6 +16,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -36,6 +37,7 @@ public class HeatingSettings implements Serializable {
 	private long id = 0;
 	
 	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
+	@JoinColumn(name="HEATING_SETTINGS_ID")
 	//private List<ZoneSetting> zones = new ArrayList<>();
 	private List<ZoneSetting> zones;
 	

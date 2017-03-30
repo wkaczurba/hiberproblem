@@ -17,6 +17,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -39,12 +40,15 @@ public class ZoneSetting implements Serializable {
 //	private ZoneMode mode;
 //	private Boolean manualModeSetting;
 	
+	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)	
+	@JoinColumn(name="ZONE_SETTING_ID")	
+	private Set<ZoneTimerEntry> automaticModeSettings;
+	
+	
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional=false)
 	//@JoinColumn(name = "STOCK_ID", nullable = false)	
 	HeatingSettings heatingSettings;  
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)	
-	private Set<ZoneTimerEntry> automaticModeSettings;
 	
 	private ZoneSetting() {
 		automaticModeSettings = new HashSet<>();
@@ -184,39 +188,43 @@ public class ZoneSetting implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
+		return HashCodeBuilder.reflectionHashCode(this, "id");
+		
+/*		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((automaticModeSettings == null) ? 0 : automaticModeSettings.hashCode());
 //		result = prime * result + ((manualModeSetting == null) ? 0 : manualModeSetting.hashCode());
 //		result = prime * result + ((mode == null) ? 0 : mode.hashCode());
-		return result;
+		return result;*/
 	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ZoneSetting other = (ZoneSetting) obj;
-		if (automaticModeSettings == null) {
-			if (other.automaticModeSettings != null)
-				return false;
-		} else if (!automaticModeSettings.equals(other.automaticModeSettings))
-			return false;
-/*		if (manualModeSetting == null) {
-			if (other.manualModeSetting != null)
-				return false;
-		} else if (!manualModeSetting.equals(other.manualModeSetting))
-			return false;
-		if (mode != other.mode)
-			return false;*/
-		return true;
+	public boolean equals(Object that) {
+		return EqualsBuilder.reflectionEquals(this, that, "id");
+		
+//		if (this == obj)
+//			return true;
+//		if (obj == null)
+//			return false;
+//		if (getClass() != obj.getClass())
+//			return false;
+//		ZoneSetting other = (ZoneSetting) obj;
+//		if (automaticModeSettings == null) {
+//			if (other.automaticModeSettings != null)
+//				return false;
+//		} else if (!automaticModeSettings.equals(other.automaticModeSettings))
+//			return false;
+///*		if (manualModeSetting == null) {
+//			if (other.manualModeSetting != null)
+//				return false;
+//		} else if (!manualModeSetting.equals(other.manualModeSetting))
+//			return false;
+//		if (mode != other.mode)
+//			return false;*/
+//		return true; 
 	}
 
 	
