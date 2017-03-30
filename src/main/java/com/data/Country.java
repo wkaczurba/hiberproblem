@@ -1,14 +1,7 @@
 package com.data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,14 +10,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Entity
-public class HeatingSettings implements Serializable {
+public class Country implements Serializable {
 	
 	/**
 	 * 
@@ -33,115 +25,41 @@ public class HeatingSettings implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="HEATING_SETTINGS_ID")
+	@Column(name="COUNTRY_ID")
 	private long id = 0;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.EAGER, orphanRemoval=true)
-	@JoinColumn(name="HEATING_SETTINGS_ID")
-	//private List<ZoneSetting> zones = new ArrayList<>();
-	private List<ZoneSetting> zones;
+	@OneToMany(cascade = CascadeType.ALL, /*fetch=FetchType.EAGER,*/ orphanRemoval=true)
+	@JoinColumn(name="COUNTRY_ID")
+	private List<City> cities;
 	
-	//@SuppressWarnings("unused")
-	public HeatingSettings() { 
-		zones = new ArrayList<>();
+	public Country() { 
 	}
 	
-	public HeatingSettings(ZoneSetting... zones) {
-		this();
-		for (ZoneSetting zone : zones) {
-			this.zones.add(zone);
-			zone.setHeatingSettings(this);
-		}
-	}
-	
-	public HeatingSettings(List<ZoneSetting> zones) {
-		this();
-		throw new IllegalStateException("This funciton should not be called");
-//		this.zones.clear();
-//		this.zones.addAll(zones);
-		//this.zones = zones;
-	}
-	
-//	public HeatingSettings(HeatingSettings h) {
-//		h.getZones().stream().forEach(z -> zones.add(new ZoneSetting(z)) );
-//	}
-	
-	public static HeatingSettings createRandom() {
-		// TODO Auto-generated method stub
-		List<ZoneSetting> zones = new ArrayList<>();
-		
-		HeatingSettings hs = new HeatingSettings();
-		
-		IntStream.range(0, (new Random()).nextInt(10) ).forEach(i -> hs.getZones().add( ZoneSetting.createRandom() ));
-		
-		return hs;
-	}
-
 	/**
 	 * @return the zones
 	 */
-	public List<ZoneSetting> getZones() {
-		return zones;
+	public List<City> getCities() {
+		return cities;
+	}
+	
+	public void setCities(List<City> cities) {
+		this.cities = cities;
 	}
 
-//	/**
-//	 * @param zones the zones to set
-//	 */
-//	public void setZones(List<ZoneSetting> zones) {
-//		//this.zones.clear();
-//		//this.zones.addAll(zones);
-//		//this.zones = new ArrayList<>(zones);
-//		//this.zones = zones;
-//		this.zones = zones;
-//	}
-	
-	public void addZone(ZoneSetting zone) {
-		zones.add(zone);
-	}
-	
-	public void addAllZones(Collection<? extends ZoneSetting> zones) {
-		this.zones.addAll(zones);
-	}
-
-//	@Override
-//	public String toString() {
-//		return "HeatingSettings [id=" + id + ", zones=" + zones + "]";
-//	}
-	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("HeatingSettings id=\""+ id +"\":\n"); 
-		if (zones == null) {
-			sb.append("zones == null\n");
+		sb.append("Country id=\""+ id +"\":\n"); 
+		if (cities == null) {
+			sb.append("cities == null\n");
 		} else {
-			for (int i=0; i<zones.size(); i++) {
-				sb.append((i + ": " + zones.get(i).toString()) .replaceAll("(?m)^", "    "));
-				if (i < zones.size())
+			for (int i=0; i<cities.size(); i++) {
+				sb.append((i + ": " + cities.get(i).toString()) .replaceAll("(?m)^", "    "));
+				if (i < cities.size())
 					sb.append("\n");
 			}
 			sb.deleteCharAt(sb.lastIndexOf("\n"));
-			
-//			zones.forEach(x -> {
-//				sb.append(x.toString().replaceAll("(?m)^", "\t"));
-//				sb.append("\n");
-//			});
-			
-			
-//			sb.append(
-//				zones.stream().map(z -> {
-//					return Arrays.<String>asList(z.toString().split("\n"))
-//						.stream()
-//						.map(s -> "  " + s.replace("\r", "").trim())
-//						.collect(Collectors.joining(String.format("%n")));
-//				}).map(s -> "  " + s)
-//					.collect(Collectors.joining(String.format("%n")))
-//			);
-			
-			
 		}
-		//sb.append("]");
-		
 		return sb.toString();
 	}
 
@@ -159,59 +77,11 @@ public class HeatingSettings implements Serializable {
 		this.id = id;
 	}
 
-//	/* (non-Javadoc)
-//	 * @see java.lang.Object#hashCode()
-//	 */
-//	@Override
-//	public int hashCode() {
-//		final int prime = 31;
-//		int result = 1;
-//		result = prime * result + ((zones == null) ? 0 : zones.hashCode());
-//		return result;
-//	}
-//
-//	/* (non-Javadoc)
-//	 * @see java.lang.Object#equals(java.lang.Object)
-//	 */
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (this == obj)
-//			return true;
-//		if (obj == null)
-//			return false;
-//		if (getClass() != obj.getClass())
-//			return false;
-//		HeatingSettings other = (HeatingSettings) obj;
-//		if (zones == null) {
-//			if (other.zones != null)
-//				return false;
-//		} else { /*if (!zones.equals(other.zones))
-//			return false;*/
-//
-//		
-//			// This is hack as List will be replaced with PersistenceBag.
-//			// The latter does not compare elements one after another but compares object references only.  
-//			if (zones.size() != other.zones.size())
-//				return false;
-//			for (int i=0; i < zones.size(); i++)
-//				if (!zones.get(i).equals(other.zones.get(i)))
-//					return false;
-//					
-//		}
-//		return true;
-//	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		return HashCodeBuilder.reflectionHashCode(this, "id");
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object that) {
 		return EqualsBuilder.reflectionEquals(this, that, "id");

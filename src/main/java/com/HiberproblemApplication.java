@@ -12,10 +12,12 @@ public class HiberproblemApplication {
 		
 		Problem problem = context.getBean(Problem.class);
 		
-		problem.problem();
+		problem.addStreet();
 		problem.read();
 		
 		// TODO: Try removing array list etc from private constructors.!
 		
+		problem.remove();
+		problem.read();
 	}
 }
